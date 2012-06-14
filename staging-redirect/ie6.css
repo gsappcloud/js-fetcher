@@ -1,0 +1,89 @@
+/* Zoom declarations */
+.view-calendar thead tr {
+    top:28px;
+    zoom:1;
+    border:solid 1px #FFF;
+}
+#search-form .search-advanced .form-item,
+#search-form .search-advanced .criterion {
+    width:180px;
+    float:left;
+    margin-right:5px;
+}
+#search-form .search-advanced .criterion {
+    margin-left:5px;
+}
+.page-all-courses ul li {
+    zoom:1;
+    list-style-type:none;
+    list-style-image:none;
+    list-style:none;
+}
+.page-all-courses .view-work-taxonomy-term table,
+.page-all-courses .view-work-taxonomy-term table thead,
+.page-all-courses .view-work-taxonomy-term table thead tr,
+.page-all-courses .view-work-taxonomy-term table tr {
+    zoom:1;
+    position:relative;
+}
+.node-type-overview-page .right-overview-sidebar {
+    zoom:1;
+}
+.tabs ul li a {
+    display:inline !important;
+}
+#block-views-calendar-calendar_block table, .front .right_inner #block-block-23 .calendar-calendar table {
+    position:relative;
+    margin-bottom:25px;
+    zoom:1;
+}
+#block-views-calendar-calendar_block table thead, #block-views-calendar-calendar_block table thead th {
+    zoom:1;
+}
+#block-views-calendar-calendar_block table thead tr {
+    position:absolute;
+    top:20px;
+    font-weight:bold;
+    zoom:1;
+}
+#block-views-calendar-calendar_block table tbody tr, .front .right_inner #block-block-23 .calendar-calendar table tbody tr {
+    position:relative;
+    top:18px;
+    zoom:1;
+}
+.front .right_inner #block-block-23 .calendar-calendar,
+.front .right_inner #block-block-23 .calendar-calendar table thead,
+.front .right_inner #block-block-23 .calendar-calendar table thead tr th {
+    zoom:1;
+}
+.front .right_inner #block-block-23 .calendar-calendar table thead tr {
+    position:absolute;
+    top:0px;
+    font-weight:bold;
+    zoom:1;
+}
+.front #search-block-form {
+    position:relative;
+    zoom:1;
+    height:60px;
+}
+.front #search-block-form input.edit-submit {
+    background:transparent none repeat scroll 0 0;
+    border:medium none;
+    display:block;
+    font-size:10px;
+    margin:15px 10px 4px;
+    text-transform:uppercase;
+    zoom:1;
+    position:absolute;
+    float:right;
+    bottom: 5px;
+    right:0px;
+}
+.page-school-programs .node .content .entry {
+    zoom:1;
+}
+
+.section-my-site .my-site-lite-remove{
+right:12px;
+}

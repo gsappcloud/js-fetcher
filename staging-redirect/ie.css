@@ -1,0 +1,49 @@
+/* Zoom declarations */
+.view-content .field-content a {
+    zoom: 1;
+}
+.section-news-events .right_outer .item-list ul li {
+    padding-top:0px !important;
+    margin-top:0px !important;
+    border:1px solid #F8F9F9;
+}
+.section-news-events .right_outer .item-list ul li .views-field-title {
+    padding-top:0px !important;
+    margin-top:0px !important;
+    border:1px solid #F8F9F9;
+}
+.section-news-events .right_outer .item-list ul li .views-field-title .field-content {
+    padding-top:0px !important;
+    margin-top:0px !important;
+    border:1px solid #F8F9F9;
+}
+.section-news-events .right_outer .item-list ul li:hover {
+    border:1px solid #efefef;
+}
+.section-news-events .right_outer .item-list ul li .views-field-title:hover {
+    border:1px solid #efefef;
+}
+.section-news-events .right_outer .item-list ul li .views-field-title .field-content:hover {
+    border:1px solid #efefef;
+}
+.menu-name-primary-links ul li {
+    zoom:1;
+    list-style-type:none;
+    list-style-image:none;
+    list-style:none;
+}
+.menu ul li {
+    zoom:1;
+    list-style-type:none;
+    list-style-image:none;
+    list-style:none;
+}
+.item-list ul li {
+    zoom:1;
+    list-style-type:none;
+    list-style-image:none;
+    list-style:none;
+}
+.front .right_inner #block-block-23 .calendar-calendar td {
+    background-color: #FFFFFF;
+}

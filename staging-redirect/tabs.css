@@ -1,0 +1,134 @@
+/* $Id: tabs.css,v 1.1.2.3 2007/11/29 00:51:00 johnalbin Exp $ */
+
+/*
+* Tabs CSS
+*
+* Adds styles for the primary and secondary tabs.
+*
+* Compare this with default CSS found in the system module's stylesheet (a copy
+* of which is in drupal5-reference.css, line 510.)
+*
+*/
+
+ul.primary
+{
+margin: 0;
+padding: 0;
+border-width: 0;
+list-style: none;
+white-space: nowrap;
+line-height: normal;
+}
+
+ul.primary li
+{
+float: left;
+margin: 1px 5px 5px 0;
+padding: 0.25em 0 !important;
+border: 1px solid #324262;
+outline: 1px solid #FFF;
+}
+
+ul.primary li:hover {
+border: 1px solid #7F8C49;
+outline: 1px solid #7F8C49;
+}
+
+ul.primary li.active {
+border: 1px solid #9CAD40;
+outline: 1px solid #9CAD40;
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+
+
+#content ul.primary li a
+{
+display: block;
+margin: 0;
+padding: 0;
+border-width: 0;
+font-weight: bold;
+text-decoration: none;
+color: #324262;
+background-color: transparent;
+}
+
+ul.primary li a .tab
+{
+display: block;
+margin: 0;
+padding: 0px 8px;
+border-width: 0;
+line-height: 20px;
+}
+
+#content ul.primary li a:hover
+{
+border-width: 0;
+background-color: transparent;
+color: #7F8C49;
+text-decoration: underline;
+}
+
+ul.primary li a:hover .tab
+{
+}
+
+#content ul.primary li.active a,
+#content ul.primary li.active a:hover
+{
+color: #9CAD40;
+text-decoration: none;
+}
+
+ul.secondary
+{
+margin: 0;
+border-bottom: 0;
+list-style: none;
+white-space: nowrap;
+}
+
+ul.secondary li
+{
+float: left;
+margin: 0 5px 0 0;
+padding: 0;
+border-right: none;
+}
+
+ul.secondary a
+{
+display: block;
+margin: 0;
+padding: 0.25em 0.5em 0.1em !important;
+border: 1px solid #585E6C;
+outline: 1px solid #FFF;
+text-decoration: none;
+color: #585E6C;
+}
+
+ul.secondary a .tab
+{
+display: block;
+height: 18px; /* 24px (parent) - 6px (padding) */
+margin: 0;
+line-height: 18px;
+}
+
+ul.secondary a:hover
+{
+border: 1px solid #7F8C49 !important;
+outline: 1px solid #7F8C49;
+color: #7F8C49 !important;
+}
+
+ul.secondary a.active,
+ul.secondary a.active:hover
+{
+border: 1px solid #9CAD40 !important;
+outline: 1px solid #9CAD40;
+color: #9CAD40 !important;
+font-weight: bold;
+}
