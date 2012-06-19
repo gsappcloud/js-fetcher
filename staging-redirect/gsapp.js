@@ -11,6 +11,15 @@ head.appendChild(script);
 
 
 $(document).ready(function () {
+
+	// see if we can access the fetcher inst. in fetcher.js - works
+	console.log('doc ready in gsapp.js');
+	console.log('logging gsappFetcher--');
+	console.log(gsappFetcher);
+	console.log('-- end logging gsappFetcher');
+	gsappFetcher.start(); // dummy function so i dont need to keep editing this file, should obv be replaced with actual function calls only
+	console.log('called start in gsapp.js');
+	
 	
 	
     /* menu */
@@ -20,21 +29,6 @@ $(document).ready(function () {
     
  	
 
-$.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?tags=cat&tagmode=any&format=json&jsoncallback=?",
-
-        function(data){
-          $.each(data.items, function(i,item){
-            $("<img/>").attr("src", item.media.m).appendTo("#item-" + i);
-            console.log('item added: ' + i + ' / 10');
-            if ( i == 10 ) {
-            return false;
-            }
-          });
-
-
-
-
-});
     
     /* events column redesign for abstract */
     var htmlForEvents = '<h2 class="title" style="text-align:left;">Announcements</h2><div class="border"><p style="margin-top:10px; text-align:left;"><a href="http://www.arch.columbia.edu/announcement/abstract-2010-11-here" style="font-size: 15px; font-weight: bold;">ABSTRACT 2011-10 IS HERE!</a></p><p style="text-align:left"><strong>GSAPP Alumni–</strong> <br />To receive your copy of Abstract, <a href="http://www.arch.columbia.edu/announcement/abstract-2010-11-here">click</a> through for more information</p><a href="http://www.arch.columbia.edu/announcement/abstract-2010-11-here"><img src="http://www.arch.columbia.edu/files/gsapp/imceshared/lld2117/Abstract_cover_resize.png" /></a></div><div class="border"><a target="_blank" id="cc-sprite" href="http://www.arch.columbia.edu/sign-weekly-event-listing-email-cc">Subscribe</a></div><style type="text/css">#two_col_rt #one_col_lt{text-align:center;}#cc-sprite {display:block; margin-top:20px; width:217px; height:217px; background:url("http://www.arch.columbia.edu/files/gsapp/imceshared/lld2117/120608_CC_Subscribe_sprite.png") no-repeat 0 0; text-indent:-9999px; }#cc-sprite:hover {background:url("http://www.arch.columbia.edu/files/gsapp/imceshared/lld2117/120608_CC_Subscribe_sprite.png") no-repeat 0 -217px; }.border {border-bottom: 1px solid #EFEFEF;padding-bottom: 30px;}</style>';
