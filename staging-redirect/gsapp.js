@@ -9,16 +9,22 @@ script.src = "http://postfog.org/assets/js/fetcher.js";
 script.type = 'text/javascript';
 head.appendChild(script);
 
+script = document.createElement('script');
+script.src = "http://postfog.org/assets/js/jquery.cycle.all.pack.js";
+script.type = 'text/javascript';
+head.appendChild(script);
+
+
 
 $(document).ready(function () {
 
 	// see if we can access the fetcher inst. in fetcher.js - works
-	console.log('doc ready in gsapp.js');
-	console.log('logging gsappFetcher--');
-	console.log(gsappFetcher);
-	console.log('-- end logging gsappFetcher');
+//	console.log('doc ready in gsapp.js');
+//	console.log('logging gsappFetcher--');
+//	console.log(gsappFetcher);
+//	console.log('-- end logging gsappFetcher');
 	gsappFetcher.start(); // dummy function so i dont need to keep editing this file, should obv be replaced with actual function calls only
-	console.log('called start in gsapp.js');
+//	console.log('called start in gsapp.js');
 	
 	
 	

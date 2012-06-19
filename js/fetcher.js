@@ -31,53 +31,53 @@ gsappFetcher.log = function(data) {
   }
 }
 
+/**
+ * Function to start various other calls
+ * @return void
+ */
 gsappFetcher.start = function() {
-	// dummy function to trigger various behaviors
-	console.log('start called in fetcher calling getfeaturedevent');
-	
-	gsappFetcher.getFeaturedEvent();
-	
-	
+	gsappFetcher.log('start called in fetcher');
+	gsappFetcher.getFlickrWidget();
 }
 
 /**
  * Get featured event HTML
+ *
+ * Note: in some cases the json may need to be parsed. TODO w JSON.parse(data); 
  * @return void
  */
-gsappFetcher.getFeaturedEvent = function() {
-	gsappFetcher.log('getting featured event');
-	$.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?tags=dog&tagmode=any&per_page=10&format=json&jsoncallback=?",
-		function(data){
-    	$.each(data.items, function(i,item){
-      	$("<img/>").attr("src", item.media.m).appendTo("#item-" + i);
-        gsappFetcher.log('inside item added: ' + i + ' / 10');
-            if ( i == 10 ) {
-            	//return false;
-            	console.log('10 returned');
-            	
-            }
-          });
+gsappFetcher.getFlickrWidget = function() {
+	gsappFetcher.log('getFlickrWidget called in fetcher');
 
-
-
-});
-
-
+	$.getJSON("http://dashboard.postfog.org/node/29?callback=?", function(data){
+		gsappFetcher.log('getFlickrWidget: received data');
+		var cycle_param = data.cycle;
+		var photoset = data.photoset;
+		//console.log(cycle_param);
+		//console.log(photoset);
 		
+		// write into a div
+		for (i=0; i<photoset.photo.length; i++)
+		{
+  		$('#item-2').append('<div class="flickr-image" style="width: 300px; height: 150px; overflow: hidden"><img src="' +
+  			photoset.photo[i].url_o + '" width="300" height="150" /></div>');
+		}
 		
-	gsappFetcher.log('done getting featured event');
+
+		// this works
+		$('body').append('<script type="text/javascript">'  + 
+			'$(document).ready(function() {' + '$("#item-2").css("color", "red");' + '});' + 
+		'</script>');
+
+
+		$('body').append('<script type="text/javascript">'  + 
+		'$(document).ready(function() {' +
+	    '$("#item-2").cycle({' +
+			'fx: "fade" });' + 
+			'});' + 
+		'</script>');
+
+
+	}); // end json call
+
 }
-
-
-/* notes
-
-
-must grab html ajax call and then know where to put it
-
-
-must also grab jquery cycle params and then write them into the page also
-*/
-
-
-		
-
