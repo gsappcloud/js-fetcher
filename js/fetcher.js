@@ -53,31 +53,46 @@ gsappFetcher.getFlickrWidget = function() {
 		gsappFetcher.log('getFlickrWidget: received data');
 		var cycle_param = data.cycle;
 		var photoset = data.photoset;
+		var widget_params = data.widget;
+		
 		//console.log(cycle_param);
+		//console.log(widget_params);
 		//console.log(photoset);
 		
 		// write into a div
 		for (i=0; i<photoset.photo.length; i++)
 		{
-  		$('#item-2').append('<div class="flickr-image" style="width: 300px; height: 150px; overflow: hidden"><img src="' +
-  			photoset.photo[i].url_o + '" width="300" height="150" /></div>');
+			// check aspect
+			if (photoset.photo[i].aspect > 1) {
+			var inner_div = ['<div class="flickr-image ',
+  			widget_params.node_type, ' ', widget_params.size, 
+  			' ', widget_params.node_id, ' ', widget_params.group, 
+  			'" ><img src="', photoset.photo[i].url_o,
+  			'" alt="flickr-image" width="', photoset.photo[i].target_w, 
+  			'" height="', photoset.photo[i].target_h,
+  			'" style="margin-top: -', photoset.photo[i].cropdist, 'px;"', 
+  			'" /></div>'].join('');
+			} else {
+			var inner_div = ['<div class="flickr-image ',
+  			widget_params.node_type, ' ', widget_params.size, 
+  			' ', widget_params.node_id, ' ', widget_params.group, 
+  			'" ><img src="', photoset.photo[i].url_o,
+  			'" alt="flickr-image" width="', photoset.photo[i].target_w, 
+  			'" height="', photoset.photo[i].target_h,
+  			'" style="margin-left: -', photoset.photo[i].cropdist, 'px;"', 
+  			'" /></div>'].join('');
+  		}
+  		$('#item-2').append(inner_div);
 		}
 		
-
-		// this works
-		$('body').append('<script type="text/javascript">'  + 
-			'$(document).ready(function() {' + '$("#item-2").css("color", "red");' + '});' + 
-		'</script>');
-
-
-		$('body').append('<script type="text/javascript">'  + 
-		'$(document).ready(function() {' +
-	    '$("#item-2").cycle({' +
-			'fx: "fade" });' + 
-			'});' + 
-		'</script>');
-
-
+		// TODO switch fx to fade
+	var cycle_tag = ['<script type="text/javascript">',
+			'$(document).ready(function() {', '$("#item-2").cycle({',
+			'fx: "scrollDown",', 'speed: ', cycle_param.duration, ',', 
+			'slideResize: 0, containerResize: 0,',
+			'});',
+			'});', '</script>'].join('');
+		$('#item-2').append(cycle_tag);
 	}); // end json call
 
 }

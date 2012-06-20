@@ -2479,9 +2479,10 @@ margin-top:2px;
     height: 20px;
   }
   
-  .gsc-control-cse{
+.gsc-control-cse {
 	border: 1px solid black !important;
 	padding	: 15px;
+	font-family: Arial, sans-serif;
 }
   
 /* google site search */
@@ -2494,41 +2495,65 @@ table.gsc-search-box {
 	margin: 0 !important;
 }
 
-.gsc-control-cse {
-    font-family: Arial, sans-serif;
-
 
 /* masonry test */
-.item33338 {
+body .masonry-brick-widget {
 		float: left;
 		text-align:center;
 		margin: 5px;
-		background-color: yellow;
 		padding: 5px;
-		border: 1px solid #333;
 		width: 200px;
 		height: 200px;
-		
-	}
-	
-	#item-1 {height: 500px; width: 300px;}
-	#item-2 {height: 400px; width: 800px;}
-	#item-3 {height: 600px; width: 500px;}
-	#item-4 {height: 200px;}
-	
-	
-	#masonrycontainer2 {
-		border: 12px solid red;
-		width: 1200px;
-		}
-	
-	img {
-		width: inherit;
-		height: inherit;
-
-	}
-
-
-body {
-	background-color: green;
+		border: 1px solid #333;
 }
+	
+body #item-1 {height: 400px; width: 300px;}
+body #item-2 {
+	height: 240px;
+	width: 240px;
+	padding: 0;
+	overflow: hidden;
+	margin: 0;
+	
+}
+body #item-3 {height: 600px; width: 700px;}
+body #item-4 {height: 200px; }
+	
+body .wrapper {
+ width: 100%;
+}
+
+body #three_col_rt {
+  width: 100%;
+}
+
+	
+
+body #masonrycontainer2 {
+	width: 100%;
+	height: 800px;
+}
+	
+/*
+body #masonrycontainer2 .masonry-brick-widget img {
+	width: inherit;
+	height: inherit;
+	
+}
+
+body #masonrycontainter-2 .flickr-image {
+	width: inherit;
+	height: inherit;
+}
+
+*/
+body #masonrycontainter-2 .1-column {
+	width: 240px;
+}
+
+/*= widget styles -------------------------------- */
+
+
+
+
+/*= end widget styles -------------------------------- */
