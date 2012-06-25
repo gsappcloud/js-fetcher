@@ -2501,21 +2501,71 @@ body .masonry-brick-widget {
 		float: left;
 		text-align:center;
 		margin: 5px;
-		padding: 5px;
-		width: 200px;
-		height: 200px;
-		border: 1px solid #333;
+		width: 240px;
+		height: 240px;
+		border: 1px solid #ddd;
 }
 	
 body #item-1 {height: 400px; width: 300px;}
+
 body #item-2 {
+	background-color: #ddd;
+}
+
+/* flickr widget container */
+body #item-2 .slideshow {
 	height: 240px;
 	width: 240px;
-	padding: 0;
 	overflow: hidden;
-	margin: 0;
-	
+	margin: auto;
+	padding: 0;
 }
+
+.flickr-image.flickr_widget.one-column {
+		width: 220px;
+		height: 220px;
+		margin: 10px 10px 5px 10px;
+		overflow: hidden;
+}
+
+#item-2 .button {
+	z-index:999;
+	position: absolute;
+	top: 45%;
+	cursor: pointer;
+	width: 30px;
+	height: 30px;
+}
+
+#item-2 .button a {
+	text-decoration: none;
+	padding: 5px;
+}
+
+#item-2 #prev-button {
+	left: 0;	background:url(http://events.gsapp.org/sites/all/themes/events/images/slider-arrows.png) 0 0;
+}
+
+#item-2 #next-button {
+	left: 88%;	background:url(http://events.gsapp.org/sites/all/themes/events/images/slider-arrows.png) -31px 0;
+}
+
+#item-2 .widget-data {
+	width: inherit;
+	text-align: left;
+	padding: inherit;
+}
+
+#item-2 .widget-data .widget-data-title {
+	font-size: 11px;
+	font-weight: bold;
+	margin-bottom: 2px;
+}
+
+#item-2 .widget-data .widget-data-description {
+	font-size: 10px;
+}
+
 body #item-3 {height: 600px; width: 700px;}
 body #item-4 {height: 200px; }
 	
