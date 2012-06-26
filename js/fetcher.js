@@ -37,13 +37,16 @@ gsappFetcher.log = function(data) {
  */
 gsappFetcher.start = function() {
 	gsappFetcher.log('start called in fetcher');
-	gsappFetcher.getFlickrWidget(
+/*
+	commenting this out since this is now being called in the nodequeue based preview page
+gsappFetcher.getFlickrWidget(
 		"http://dashboard.postfog.org/node/30?callback=?", "#item-1");
 		
 		
 	gsappFetcher.getFlickrWidget(
 		"http://dashboard.postfog.org/node/29?callback=?", "#item-2");
 
+*/
 
 }
 
