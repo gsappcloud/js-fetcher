@@ -38,7 +38,13 @@ gsappFetcher.log = function(data) {
 gsappFetcher.start = function() {
 	gsappFetcher.log('start called in fetcher');
 	gsappFetcher.getFlickrWidget(
+		"http://dashboard.postfog.org/node/30?callback=?", "#item-1");
+		
+		
+	gsappFetcher.getFlickrWidget(
 		"http://dashboard.postfog.org/node/29?callback=?", "#item-2");
+
+
 }
 
 /**
@@ -57,55 +63,55 @@ gsappFetcher.getFlickrWidget = function(url, elementName) {
 		var cycle_param = data.cycle;
 		var photoset = data.photoset;
 		var widget_params = data.widget;
-		console.log(widget_params);
+		//console.log(widget_params);
 		
 		// create inner div for the slides
-		$(elementName).append('<div class="slideshow"></div>');
+		var inner_slideshow = $('<div class="slideshow"/>').appendTo(elementName);
 
 		// write the photo divs into the .slideshow div
 		for (i=0; i<photoset.photo.length; i++)
 		{
 			// check aspect and set either margin-top or margin-left
 			if (photoset.photo[i].aspect > 1) {
-			var inner_div = ['<div class="flickr-image ',
-  			widget_params.node_type, ' ', widget_params.size, 
-  			' ', widget_params.node_id, ' ', widget_params.group, 
-  			'" ><img src="', photoset.photo[i].url_o,
-  			'" alt="flickr-image" width="', photoset.photo[i].target_w, 
-  			'" height="', photoset.photo[i].target_h,
-  			'" style="margin-top: -', photoset.photo[i].cropdist, 'px;"', 
-  			'" /></div>'].join('');
+				var inner_div = ['<div class="flickr-image ',
+					widget_params.node_type, ' ', widget_params.size, 
+					' ', widget_params.node_id, ' ', widget_params.group, 
+					'" ><img src="', photoset.photo[i].url_o,
+					'" alt="flickr-image" width="', photoset.photo[i].target_w, 
+					'" height="', photoset.photo[i].target_h,
+					'" style="margin-top: -', photoset.photo[i].cropdist, 'px;"', 
+					'" /></div>'].join('');
 			} else {
-			var inner_div = ['<div class="flickr-image ',
-  			widget_params.node_type, ' ', widget_params.size, 
-  			' ', widget_params.node_id, ' ', widget_params.group, 
-  			'" ><img src="', photoset.photo[i].url_o,
-  			'" alt="flickr-image" width="', photoset.photo[i].target_w, 
-  			'" height="', photoset.photo[i].target_h,
-  			'" style="margin-left: -', photoset.photo[i].cropdist, 'px;"', 
-  			'" /></div>'].join('');
+				var inner_div = ['<div class="flickr-image ',
+					widget_params.node_type, ' ', widget_params.size, 
+					' ', widget_params.node_id, ' ', widget_params.group, 
+					'" ><img src="', photoset.photo[i].url_o,
+					'" alt="flickr-image" width="', photoset.photo[i].target_w, 
+					'" height="', photoset.photo[i].target_h,
+					'" style="margin-left: -', photoset.photo[i].cropdist, 'px;"', 
+					'" /></div>'].join('');
   		}
 			var inner = [elementName, ' .slideshow'].join('');
 			$(inner).append(inner_div);
+			
 		}
 		
 	var unique_tag_name = [widget_params.node_type, '-', widget_params.size, 
 			'-', widget_params.node_id, '-', widget_params.group].join('');
 
 	var next = ['<div id="next-button" class="button">',
-		'<a href="#" id="', unique_tag_name, '-next', '">&nbsp;</a></div>'].join('');
+		'<a href="#" id="', unique_tag_name, '-next',
+		'">&nbsp;</a></div>'].join('');
 	var prev = ['<div id="prev-button" class="button">',
 		'<a href="#" id="', unique_tag_name, '-prev', '">&nbsp;</a></div>'].join('');
 	$(elementName).append(next);
 	$(elementName).append(prev);
 	
 	// append data from drupal node
-	$(elementName).append(
-		['<div class="widget-data">', '<div class="widget-data-title">',
+	var widget_data = ['<div class="widget-data">', '<div class="widget-data-title">',
 			widget_params.node_title, '</div><div class="widget-data-description">',
-			widget_params.node_description, '</div></div>'].join(''));
-			
-	
+			widget_params.node_description, '</div></div>'].join('');
+			$(elementName).append(widget_data);
 	
 	// build the jquery cycle script tag inline
 	var cycle_tag = null;
@@ -120,7 +126,7 @@ gsappFetcher.getFlickrWidget = function(url, elementName) {
 		cycle_tag = ['<script type="text/javascript">',
 			'$(document).ready(function() {', '$("', elementName, 
 			' .slideshow").cycle({',
-			'fx: "fade",', 'speed: ', cycle_param.duration, ',', 
+			'fx: "scrollLeft",', 'speed: ', cycle_param.duration, ',', 
 			'slideResize: 0, containerResize: 0,',
 			'timeout: 0,',
 			'next: \'#', unique_tag_name,'-next\',',

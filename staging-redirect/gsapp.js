@@ -1,3 +1,6 @@
+/*
+commenting this out - in the move to templtzr theme i put all the includes into the page template directly to troubleshoot loading sequence issues...
+
 var head = document.getElementsByTagName('head')[0];
 script = document.createElement('script');
 script.src = "http://postfog.org/assets/js/jquery.masonry.min.js";
@@ -13,7 +16,7 @@ script = document.createElement('script');
 script.src = "http://postfog.org/assets/js/jquery.cycle.all.pack.js";
 script.type = 'text/javascript';
 head.appendChild(script);
-
+*/
 
 
 $(document).ready(function () {
