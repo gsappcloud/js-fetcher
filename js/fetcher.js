@@ -19,7 +19,7 @@ var gsappFetcher = {};
  * Whether to log to firebug console (wraps console.log)
  * @type Boolean
  */
-gsappFetcher.enableLogging = false;
+gsappFetcher.enableLogging = true;
 
 /**
  * Write to firebug console if logging enabled
@@ -50,8 +50,22 @@ gsappFetcher.getFlickrWidget(
 
 }
 
+gsappFetcher.getEventData = function(url, elementName) {
+	gsappFetcher.log("getting data from " + url + " into " + elementName);
+	
+	url = 'http://events.postfog.org/studio-x-featured-events2?callback=?';
+	
+	
+	$.getJSON(url, function(data) {
+		console.log(data);
+	}); // end getJSON
+	
+}
+
+
+
 /**
- * Get featured event HTML
+ * Create HTML from JSON feed
  *
  * @param {String} url The URL for the JSON feed
  * @param {String} elementName The name of the DOM container to write into
