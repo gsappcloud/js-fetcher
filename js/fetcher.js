@@ -45,6 +45,108 @@ gsappFetcher.log = function(data) {
   }
 }
 
+/**
+ * Find CSS color class based off location
+ * @param {String} The location string, i.e. New York
+ * @return {String, Boolean} The css class, i.e. 'north-america' if found,
+ * false otherwise
+ */
+gsappFetcher.findLocationClass = function(location_string) {
+
+	// basic array that we can use to store future location code mappings
+	locations = new Array();
+	locations['Amman'] = 'middle-east';
+	locations['Barcelona'] = 'europe';
+	locations['Beijing'] = 'asia';
+	locations['Moscow'] = 'europe';
+	locations['Mumbai'] = 'south-asia';
+	locations['New York'] = 'north-america';
+	locations['Rio de Janiero'] = 'latin-america';
+	locations['Sao Paulo'] = 'latin-america';
+
+	test_location = locations[location_string];
+	if ((test_location != null) && (test_location != undefined)) {
+		return test_location;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Parse location names from Drupal location HTML output
+ * @param {String} The location string from Drupal view output
+ * @return {Array} An arry of location strings
+ */
+gsappFetcher.getLocationsFromHTML = function(location_string) {
+	var location_element = $(location_string);
+	var locations = $("span.lineage-item", location_element);
+	var locations_array = [];
+	for (var i=0;i<locations.length;i++){
+		locations_array.push($(locations[i]).text());
+	}
+	return locations_array;
+}
+
+/**
+ * Get event types from Drupal HTML string
+ * @param {String} The location string from Drupal view output
+ * @return {Array} An arry of type strings
+ */
+gsappFetcher.getEventTypesFromHTML = function(types_string) {
+	// TODO maybe abstract this more later
+	return gsappFetcher.getLocationsFromHTML(types_string);
+}			
+
+
+/**
+ * Convert a date from drupal output to a proper JS Date object
+ * @param {String} The date string from Drupal
+ * @return {Date} JS Date object
+ */
+gsappFetcher.createDateObject = function(date_string) {
+	var year = date_string.substr(0,4);
+	var month = date_string.substr(5,2);
+	var day = date_string.substr(8,2);
+	var hour = date_string.substr(11,2);	
+	var min = date_string.substr(14,2);
+	var sec = date_string.substr(17,2);
+	return new Date(year,month,day,hour,min,sec);
+}
+
+/**
+ * Formate a Date object into a custom date string
+ * @param {Date} JS Date object
+ * @return {String} String in the format:
+ * Tuesday, May 8, 2012 7:00pm
+ */
+gsappFetcher.formatDate = function(date) {
+	date_string_a = [
+		day_names[date.getDay()], ', ',
+		month_names[date.getMonth()], ' ',
+		date.getDate(), ', ', date.getFullYear(), ' ',
+		date.getHours(), ':', date.getMinutes()];
+	// add am pm
+	if (date.getHours() > 12) {
+		date_string_a.push('pm');
+	} else {
+		date_string_a.push('am');
+	}
+	return date_string_a.join('');
+}
+
+/**
+ * Formate a Date object into a custom date string for the date box
+ * @param {Date} JS Date object
+ * @return {String} HTML string in the format:
+ * May<br/>8
+ */
+
+gsappFetcher.formatDateForBox = function(date) {
+	var month_name = month_names[date.getMonth()];
+	return [month_name.substr(0,3), '<br/>',
+		date.getDate()].join('');
+}
+
 
 /**
  * Function to start various other calls
@@ -90,60 +192,54 @@ gsappFetcher.getFlickrWidget(
 
 gsappFetcher.getEventData = function(url, elementName) {
 	gsappFetcher.log("getting data from " + url + " into " + elementName);
-	
-	//url = 'http://events.postfog.org/studio-x-featured-events2?callback=?';
 	$.getJSON(url, function(data) {
 		var nodes = data.nodes;
-		console.log(nodes);
-		for (i=0; i<nodes.length;i++) {
+		for (var i=0; i<nodes.length;i++) {
 			var event = nodes[i].node;
 			console.log(event);
-			var ds = event.field_event_date_value;
-			// need to convert the date string into a js date object
-			var year = ds.substr(0,4);
-			var month = ds.substr(5,2);
-			var day = ds.substr(8,2);
-			var hour = ds.substr(11,2);	
-			var min = ds.substr(14,2);
-			var sec = ds.substr(17,2);
-			var date = new Date(year,month,day,hour,min,sec);
-			// need to set it back 5 hours to account for offset
+			// convert date and offset it
+			var date = gsappFetcher.createDateObject(event.field_event_date_value);
 			var five_hour_offset = 60000 * 300;
 			date = new Date(date-five_hour_offset);
+			var date_string = gsappFetcher.formatDate(date);
+			var date_string_for_box = gsappFetcher.formatDateForBox(date);
 
-			// reconvert to string
-			date_string_a = [
-				day_names[date.getDay()], ', ',
-				month_names[date.getMonth()], ' ',
-				date.getDate(), ', ', date.getFullYear(), ' ',
-				date.getHours(), ':', date.getMinutes()];
-			// add am pm
-			if (date.getHours() > 12) {
-				date_string_a.push('pm');
-			} else {
-				date_string_a.push('am');
+			// parse locations and assign css classes for color
+			var locations_array = gsappFetcher.getLocationsFromHTML(
+				event.field_event_location_value);
+			var color_locations = [];
+			// TODO move to function: get css classes
+			for (var j=0;j<locations_array.length;j++) {
+				var color_class = gsappFetcher.findLocationClass(locations_array[j]);
+				if (color_class != false) {
+					color_locations.push(color_class);
+				}
 			}
-			date_string = date_string_a.join('');
 			
+			// parse event types
+			var types_array = gsappFetcher.getEventTypesFromHTML(event.field_event_taxonomy_type_value);
+			console.log(types_array);
 			
-			// parse location
-			var location_html = event.field_event_location_value;
-			
-			// parse type
-			var type_html = event.field_event_taxonomy_type_value;
-			
+			// get the path to the node
 			// TODO UPDATE path to prod
 			var path = ['http://events.postfog.org/node/', event.nid].join('');
 			
 			// build the div
-			
-			
-			var event_div = ['<div class="embedded-event">'];
-			
-			
-			
-			
-
+			var event_div = ['<div class="embedded-event">',
+				'<a href="', path, '">', 
+				'<div class="embedded-event-top-area">',
+				'<div class="embedded-event-date-box">',
+				date_string_for_box, '</div>',
+				'<div class="embedded-event-title">', event.title, '</div>',
+				'</div></a>', // end top area
+				'<div class="embedded-event-body-area">',
+				'<div class="embedded-event-type"></div>',
+				'<div class="embedded-event-date"></div>',
+				'<div class="embedded-event-location"></div>',
+				'<div class="embedded-event-description"></div>',
+				'</div>', '</div>'].join('');
+				
+			$(elementName).append(event_div);
 		}
 		
 		
