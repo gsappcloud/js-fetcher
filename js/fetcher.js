@@ -1,13 +1,12 @@
-/**
- * Namespacing
- */
-var gsappFetcher = {};
-
-
 /* 6/13/2012
  *
  * Author: Jochen Hartmann
  */
+
+/**
+ * Namespacing
+ */
+var gsappFetcher = {};
 
 /**
  * @fileoverview Frontend app to to handle events and DOM manipulation for
@@ -22,6 +21,21 @@ var gsappFetcher = {};
 gsappFetcher.enableLogging = true;
 
 /**
+ * Storing proper stings for month names since the native JS Date object
+ * only contains abbreviations
+ * @type Array
+ */
+gsappFetcher.month_names;
+
+/**
+ * Storing proper stings for day names since the native JS Date object
+ * only contains abbreviations
+ * @type Array
+ */
+gsappFetcher.day_names;
+
+
+/**
  * Write to firebug console if logging enabled
  * @param {String,Object} data The item to log
  */
@@ -31,11 +45,35 @@ gsappFetcher.log = function(data) {
   }
 }
 
+
 /**
  * Function to start various other calls
  * @return void
  */
 gsappFetcher.start = function() {
+	// initialize internal data
+	month_names = new Array ( );
+	month_names[month_names.length] = "January";
+	month_names[month_names.length] = "February";
+	month_names[month_names.length] = "March";
+	month_names[month_names.length] = "April";
+	month_names[month_names.length] = "May";
+	month_names[month_names.length] = "June";
+	month_names[month_names.length] = "July";
+	month_names[month_names.length] = "August";
+	month_names[month_names.length] = "September";
+	month_names[month_names.length] = "October";
+	month_names[month_names.length] = "November";
+	month_names[month_names.length] = "December";
+	day_names = new Array ( );
+	day_names[day_names.length] = "Sunday";
+	day_names[day_names.length] = "Monday";
+	day_names[day_names.length] = "Tuesday";
+	day_names[day_names.length] = "Wednesday";
+	day_names[day_names.length] = "Thursday";
+	day_names[day_names.length] = "Friday";
+	day_names[day_names.length] = "Saturday";
+
 	gsappFetcher.log('start called in fetcher');
 /*
 	commenting this out since this is now being called in the nodequeue based preview page
@@ -53,11 +91,63 @@ gsappFetcher.getFlickrWidget(
 gsappFetcher.getEventData = function(url, elementName) {
 	gsappFetcher.log("getting data from " + url + " into " + elementName);
 	
-	url = 'http://events.postfog.org/studio-x-featured-events2?callback=?';
-	
-	
+	//url = 'http://events.postfog.org/studio-x-featured-events2?callback=?';
 	$.getJSON(url, function(data) {
-		console.log(data);
+		var nodes = data.nodes;
+		console.log(nodes);
+		for (i=0; i<nodes.length;i++) {
+			var event = nodes[i].node;
+			console.log(event);
+			var ds = event.field_event_date_value;
+			// need to convert the date string into a js date object
+			var year = ds.substr(0,4);
+			var month = ds.substr(5,2);
+			var day = ds.substr(8,2);
+			var hour = ds.substr(11,2);	
+			var min = ds.substr(14,2);
+			var sec = ds.substr(17,2);
+			var date = new Date(year,month,day,hour,min,sec);
+			// need to set it back 5 hours to account for offset
+			var five_hour_offset = 60000 * 300;
+			date = new Date(date-five_hour_offset);
+
+			// reconvert to string
+			date_string_a = [
+				day_names[date.getDay()], ', ',
+				month_names[date.getMonth()], ' ',
+				date.getDate(), ', ', date.getFullYear(), ' ',
+				date.getHours(), ':', date.getMinutes()];
+			// add am pm
+			if (date.getHours() > 12) {
+				date_string_a.push('pm');
+			} else {
+				date_string_a.push('am');
+			}
+			date_string = date_string_a.join('');
+			
+			
+			// parse location
+			var location_html = event.field_event_location_value;
+			
+			// parse type
+			var type_html = event.field_event_taxonomy_type_value;
+			
+			// TODO UPDATE path to prod
+			var path = ['http://events.postfog.org/node/', event.nid].join('');
+			
+			// build the div
+			
+			
+			var event_div = ['<div class="embedded-event">'];
+			
+			
+			
+			
+
+		}
+		
+		
+		
 	}); // end getJSON
 	
 }
