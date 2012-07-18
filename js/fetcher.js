@@ -62,7 +62,9 @@ gsappFetcher.findLocationClass = function(location_string) {
 	locations['New York'] = 'north-america';
 	locations['Rio de Janiero'] = 'latin-america';
 	locations['Sao Paulo'] = 'latin-america';
-
+	locations['Toronto'] = 'north-america';
+	
+	
 	test_location = locations[location_string];
 	if ((test_location != null) && (test_location != undefined)) {
 		return test_location;
@@ -248,7 +250,7 @@ gsappFetcher.getEventData = function(url, elementName) {
 			// parse locations and assign css classes for color
 			var locations_array = gsappFetcher.getLocationsFromHTML(
 				event.field_event_location_value);
-			
+
 			var css_class_for_location = 
 				gsappFetcher.getCSSColorClassForLocations(
 					locations_array);
@@ -269,9 +271,10 @@ gsappFetcher.getEventData = function(url, elementName) {
 			
 			// build the div
 			var event_div = ['<div class="embedded-event">',
-				'<a class="region" href="', path, '">', 
+				'<a target="_blank" class="region" href="', path, '">', 
 				'<div class="embedded-event-top-area">',
-				'<div class="embedded-event-date-box"><div>',
+				'<div class="embedded-event-date-box ',
+				css_class_for_location, '"><div>',
 				date_string_for_box, '</div></div>',
 				'<div class="embedded-event-title">', event.title, '</div>',
 				'</div></a>', // end top area
@@ -283,11 +286,21 @@ gsappFetcher.getEventData = function(url, elementName) {
 				locations_array[1], '</div>',
 				'<div class="embedded-event-description">', event_description_string,
 				'</div>',
+				'<div class="embedded-event-description-more"><a href="', path, 
+				'" target="_blank" alt="More information">...</a></div>',
 				'<div class="embedded-event-image">', event.field_event_poster_fid,
 				'</div>',
 				'</div>', '</div>'].join('');
 			$(elementName).append(event_div);
 		}
+		
+		$("#tmpltzr .content #event-output .embedded-event-top-area").hover(function() {
+			$(this).children(".embedded-event-date-box").addClass('filled');
+		}, 
+		function() {
+			$(this).children(".embedded-event-date-box").removeClass('filled');
+		});
+
 		
 		
 		
