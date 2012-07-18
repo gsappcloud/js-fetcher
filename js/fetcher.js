@@ -52,7 +52,6 @@ gsappFetcher.log = function(data) {
  * false otherwise
  */
 gsappFetcher.findLocationClass = function(location_string) {
-
 	// basic array that we can use to store future location code mappings
 	locations = new Array();
 	locations['Amman'] = 'middle-east';
@@ -71,6 +70,23 @@ gsappFetcher.findLocationClass = function(location_string) {
 		return false;
 	}
 }
+
+/**
+ * Convert location array to CSS color array
+ * @param {Array} An array of locations
+ * @return {String} The CSS class found for the location
+ */
+gsappFetcher.getCSSColorClassForLocations = function(locations_array) {
+	var color_location = '';
+	for (var j=0;j<locations_array.length;j++) {
+		var color_class = gsappFetcher.findLocationClass(locations_array[j]);
+		if (color_class != false) {
+			return color_class;
+		}
+	}
+	return color_location;
+}
+
 
 /**
  * Parse location names from Drupal location HTML output
@@ -96,6 +112,30 @@ gsappFetcher.getEventTypesFromHTML = function(types_string) {
 	// TODO maybe abstract this more later
 	return gsappFetcher.getLocationsFromHTML(types_string);
 }			
+
+/**
+ * Parse event description from Drupal post body, extracting
+ * all of the p tags
+ * @param {String} The body string from Drupal view output
+ * @return {Array} An array of paragraph tags
+ */
+gsappFetcher.parseEventBodyHTML = function(body_string) {
+	var body_element = $(body_string);
+	var p_tags = [];
+
+	for(var p=0;p<body_element.length;p++) {
+		var inner_element = body_element[p];
+		if (inner_element === Object(inner_element)) {
+			var html_data = inner_element.outerHTML;
+			var inner_html = inner_element.innerHTML;
+			// if inner_html len is < 6 then its probably just an nbsp tag
+			if ((inner_html != undefined) && (inner_html.length > 6)) {
+				p_tags.push(html_data);
+			}
+		}
+	}
+	return p_tags;
+}
 
 
 /**
@@ -196,49 +236,56 @@ gsappFetcher.getEventData = function(url, elementName) {
 		var nodes = data.nodes;
 		for (var i=0; i<nodes.length;i++) {
 			var event = nodes[i].node;
-			console.log(event);
 			// convert date and offset it
 			var date = gsappFetcher.createDateObject(event.field_event_date_value);
+
 			var five_hour_offset = 60000 * 300;
 			date = new Date(date-five_hour_offset);
+
 			var date_string = gsappFetcher.formatDate(date);
 			var date_string_for_box = gsappFetcher.formatDateForBox(date);
 
 			// parse locations and assign css classes for color
 			var locations_array = gsappFetcher.getLocationsFromHTML(
 				event.field_event_location_value);
-			var color_locations = [];
-			// TODO move to function: get css classes
-			for (var j=0;j<locations_array.length;j++) {
-				var color_class = gsappFetcher.findLocationClass(locations_array[j]);
-				if (color_class != false) {
-					color_locations.push(color_class);
-				}
-			}
+			
+			var css_class_for_location = 
+				gsappFetcher.getCSSColorClassForLocations(
+					locations_array);
 			
 			// parse event types
 			var types_array = gsappFetcher.getEventTypesFromHTML(event.field_event_taxonomy_type_value);
-			console.log(types_array);
 			
 			// get the path to the node
 			// TODO UPDATE path to prod
 			var path = ['http://events.postfog.org/node/', event.nid].join('');
 			
+			// parse the body tag
+			var event_description = gsappFetcher.parseEventBodyHTML(event.body);
+			
+			// for now we only care about the first 2 paragraphs if they are not empty
+			var event_description_string = [
+				event_description[0], event_description[1]].join(''); 
+			
 			// build the div
 			var event_div = ['<div class="embedded-event">',
-				'<a href="', path, '">', 
+				'<a class="region" href="', path, '">', 
 				'<div class="embedded-event-top-area">',
-				'<div class="embedded-event-date-box">',
-				date_string_for_box, '</div>',
+				'<div class="embedded-event-date-box"><div>',
+				date_string_for_box, '</div></div>',
 				'<div class="embedded-event-title">', event.title, '</div>',
 				'</div></a>', // end top area
 				'<div class="embedded-event-body-area">',
-				'<div class="embedded-event-type"></div>',
-				'<div class="embedded-event-date"></div>',
-				'<div class="embedded-event-location"></div>',
-				'<div class="embedded-event-description"></div>',
+				'<div class="embedded-event-type">', types_array[0], '</div>',
+				'<div class="embedded-event-date">', date_string, '</div>',
+				'<div class="embedded-event-location ',
+				css_class_for_location, '">',
+				locations_array[1], '</div>',
+				'<div class="embedded-event-description">', event_description_string,
+				'</div>',
+				'<div class="embedded-event-image">', event.field_event_poster_fid,
+				'</div>',
 				'</div>', '</div>'].join('');
-				
 			$(elementName).append(event_div);
 		}
 		
@@ -266,7 +313,6 @@ gsappFetcher.getFlickrWidget = function(url, elementName) {
 		var cycle_param = data.cycle;
 		var photoset = data.photoset;
 		var widget_params = data.widget;
-		//console.log(widget_params);
 		
 		// create inner div for the slides
 		var inner_slideshow = $('<div class="slideshow"/>').appendTo(elementName);
