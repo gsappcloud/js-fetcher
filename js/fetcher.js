@@ -301,47 +301,7 @@ gsappFetcher.getTumblr = function(url, element_name) {
 			}
 			
 			// TODO image aspect resizing for proper IMG tags
-			
-	
-	/*		
-	link
-	this["link-description"];
-	this["link-text"];
-	this["link-url"];
-	
 
-video
-this["video-caption"];
-this["video-player-500"];
-
-quote
-this["quote-source"];
-this["quote-text"];
-
-regular
-this["regular-body"];
-this["regular-title"];
-
-audio
-this["audio-caption"];
-this["audio-player"];
-this["audio-plays"];
-this["id3-title"];
-
-conversation
-this["conversation"]; // array
-this["conversation-text"];
-this["conversation-title"];
-
-photo
-this.height; // i think these are for the original dimensions, so use for aspect
-this["photo-caption"];
-this["photo-url-500"];
-this["photos"]; // array !
-this.width;
-
-			
-			*/
 			var tumblr_title = null;
 			var tumblr_content = null;
 			var tumblr_caption = null;
@@ -378,7 +338,7 @@ this.width;
 					break;
 				case 'conversation':
 				
-				//TODO
+				//TODO break up into structured inner divs
 					tumblr_title = this["conversation-title"] || null;
 					tumblr_content = this["conversation-text"];
 					break;
@@ -404,18 +364,6 @@ this.width;
 					break;
 			}
 			
-			/*
-			
-			div class tumblr-post
-			date
-			(title if found)
-			main content (text,photo,video,etc)
-			(caption if found)
-			hr
-			(permalink) | (tags)
-			*/
-			
-			
 			var tumblr_div = [
 				'<div class="embedded-tumblr">',
 				'<div class="embedded-tumblr-date">',
@@ -430,11 +378,9 @@ this.width;
 			
 			// main content: is there one more items (i.e. photos)
 			if (multi_content == false) {
-				// single item
 				var content_string = [
 					'<div class="embedded-tumblr-content ',
 					type, '">', tumblr_content];
-				// caption?
 				if (tumblr_caption != null) {
 					content_string.push('<div class="embedded-tumblr-caption">');
 					content_string.push(tumblr_caption);
@@ -454,7 +400,6 @@ this.width;
 				}
 				tumblr_div.push(multi_content_string.join(''));
 			}
-			// hr, permalink and tags
 			tumblr_div.push('<hr>');
 			tumblr_div.push('<div class="embedded-tumblr-permalink">');
 			tumblr_div.push(url);
@@ -468,7 +413,6 @@ this.width;
 			if ((element_name != undefined) && (element_name.length > 0)) {
 				$(elementName).append(tumblr_div_string);
 			} else {
-				// assume #tumblr-results
 				$('#tumblr-results').append(tumblr_div_string);
 			}
       
