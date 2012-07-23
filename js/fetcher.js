@@ -147,7 +147,7 @@ gsappFetcher.parseEventBodyHTML = function(body_string) {
  */
 gsappFetcher.createDateObject = function(date_string) {
 	var year = date_string.substr(0,4);
-	var month = date_string.substr(5,2);
+	var month = date_string.substr(5,2) - 1;
 	var day = date_string.substr(8,2);
 	var hour = date_string.substr(11,2);	
 	var min = date_string.substr(14,2);
@@ -162,17 +162,25 @@ gsappFetcher.createDateObject = function(date_string) {
  * Tuesday, May 8, 2012 7:00pm
  */
 gsappFetcher.formatDate = function(date) {
+
+	// append 0 to minutes if < 10
+	var minutes = date.getMinutes();
+	if (minutes < 10) {
+		minutes = '0' + minutes;
+	}
+
 	date_string_a = [
 		day_names[date.getDay()], ', ',
 		month_names[date.getMonth()], ' ',
 		date.getDate(), ', ', date.getFullYear(), ' ',
-		date.getHours(), ':', date.getMinutes()];
+		date.getHours(), ':', minutes];
 	// add am pm
 	if (date.getHours() > 12) {
 		date_string_a.push('pm');
 	} else {
 		date_string_a.push('am');
 	}
+	
 	return date_string_a.join('');
 }
 
@@ -241,10 +249,11 @@ gsappFetcher.getEventData = function(url, elementName) {
 			// convert date and offset it
 			var date = gsappFetcher.createDateObject(event.field_event_date_value);
 
-			var five_hour_offset = 60000 * 300;
-			date = new Date(date-five_hour_offset);
+			// each date has different offsets			
+			var date_offset = 60000 * date.getTimezoneOffset();
+			new_date = new Date(date - date_offset);
+			var date_string = gsappFetcher.formatDate(new_date);
 
-			var date_string = gsappFetcher.formatDate(date);
 			var date_string_for_box = gsappFetcher.formatDateForBox(date);
 
 			// parse locations and assign css classes for color
