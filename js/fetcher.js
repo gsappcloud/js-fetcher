@@ -34,6 +34,11 @@ gsappFetcher.month_names;
  */
 gsappFetcher.day_names;
 
+/**
+ * How many posts to get from a tumblr feed. Default is 10
+ * @type Number
+ */
+gsappFetcher.tumblr_posts = 10;
 
 /**
  * Write to firebug console if logging enabled
@@ -155,6 +160,7 @@ gsappFetcher.createDateObject = function(date_string) {
 	return new Date(year,month,day,hour,min,sec);
 }
 
+
 /**
  * Formate a Date object into a custom date string
  * @param {Date} JS Date object
@@ -169,17 +175,18 @@ gsappFetcher.formatDate = function(date) {
 		minutes = '0' + minutes;
 	}
 
+	var end_string = 'am';
+	var hours = date.getHours();
+	if (hours > 12) {
+		hours = hours - 12;
+		end_string = 'pm';
+	}
+	
 	date_string_a = [
 		day_names[date.getDay()], ', ',
 		month_names[date.getMonth()], ' ',
 		date.getDate(), ', ', date.getFullYear(), ' ',
-		date.getHours(), ':', minutes];
-	// add am pm
-	if (date.getHours() > 12) {
-		date_string_a.push('pm');
-	} else {
-		date_string_a.push('am');
-	}
+		hours, ':', minutes, end_string];
 	
 	return date_string_a.join('');
 }
@@ -240,6 +247,247 @@ gsappFetcher.getFlickrWidget(
 
 }
 
+
+
+
+/**
+ * Change the number of posts being read from a tumblr blog
+ * @return void
+ */
+gsappFetcher.setTumblrPosts = function(number) {
+	if ((number != undefined) && (isNaN(number) == false)) {
+		gsappFetcher.tumblr_posts = number;
+	}
+}
+
+/**
+* Function to return tumblr data from tumblr API v1
+*
+* @param {String} url The URL for the JSON feed
+* @param {String} elementName The name of the DOM container to write into. 
+* Optional. If not provided, the default div#tumblr-results will be used, if 
+* found.
+* @return void
+*/
+gsappFetcher.getTumblr = function(url, element_name) {
+	var final_url = null;
+	// clean the URL in case / at last char
+	if (url.charAt(url.length-1) == '/') {
+		url = url.substr(0, url.length-1);
+	}
+	final_url = url + "/api/read/json?callback=?";
+	
+	$.getJSON(final_url, function(data) {
+    $.each(data.posts.slice(0,gsappFetcher.tumblr_posts), function(i,posts){
+      var type = this.type;
+			var url = this.url;
+			var multi_content_flag = false; 
+		
+      // format the date
+      var date_ts = this["unix-timestamp"];
+      var date = new Date(date_ts*1000); // must multiply by 1000 (js specific)
+      var date_string = gsappFetcher.formatDate(date);
+
+			// process tags if any
+      var tags = this.tags || null;
+			var tag_string = '';      
+      if (this.tags != null) {
+      	tag_string = this.tags.join(', ');
+      }
+			
+			// does the post body contain multiple photos?
+			if ((this.type == 'photo') && (this["photos"].length > 0)) {
+				multi_content_flag = true;
+			}
+			
+			// TODO image aspect resizing for proper IMG tags
+			
+	
+	/*		
+	link
+	this["link-description"];
+	this["link-text"];
+	this["link-url"];
+	
+
+video
+this["video-caption"];
+this["video-player-500"];
+
+quote
+this["quote-source"];
+this["quote-text"];
+
+regular
+this["regular-body"];
+this["regular-title"];
+
+audio
+this["audio-caption"];
+this["audio-player"];
+this["audio-plays"];
+this["id3-title"];
+
+conversation
+this["conversation"]; // array
+this["conversation-text"];
+this["conversation-title"];
+
+photo
+this.height; // i think these are for the original dimensions, so use for aspect
+this["photo-caption"];
+this["photo-url-500"];
+this["photos"]; // array !
+this.width;
+
+			
+			*/
+			var tumblr_title = null;
+			var tumblr_content = null;
+			var tumblr_caption = null;
+			var multi_content = new Array();
+			var multi_caption = new Array();
+			
+			switch(type) {
+				
+				case 'link':
+					tumblr_content_a = new Array();
+					if (this["link-text"] != null) {
+						tumblr_content_a= ['<a href="', this["link_url"], '" target="_blank">', this["link-text"], '</a>'];
+					} else {
+						// no title
+						tumblr_content_a = ['<a href="', this["link_url"], '" target="_blank">', this["link-url"], '</a>'];
+					}					
+					if (this["link-description"].length > 0) {
+						tumblr_content_a.push('<div class="embedded-tumblr-link-description">');
+						tumblr_content_a.push(this["link-description"]);
+						tumblr_content_a.push('</div>');
+					}
+					tumblr_content = tumblr_content_a.join('');
+					break;					
+				case 'quote':
+					tumblr_content = [this["quote-text"], "<br/>&mdash; ", this["quote-source"]].join('');
+					break;
+				case 'video':
+					tumblr_content = this["video-player-500"];
+					tumblr_caption = this["video-caption"] || null;
+					break;
+				case 'audio':
+					tumblr_content = this["audio-player"];
+					tumblr_caption = this["id3-title"] || null;
+					break;
+				case 'conversation':
+				
+				//TODO
+					tumblr_title = this["conversation-title"] || null;
+					tumblr_content = this["conversation-text"];
+					break;
+				case 'regular':
+					tumblr_title = this["regular-title"] || null;
+					tumblr_content = this["regular-body"] || null;
+					break;
+				case 'photo': // consider multi, if yes, then make arrays
+					if (multi_content_flag == true) {
+						for(var c=0;c<this["photos"].length;c++) {
+							var photo_item = this["photos"][c];
+							var content = ['<img src="', photo_item["photo-url-500"],
+							'" class="embedded-tumblr-image" alt="tumblr image" />'].join('');
+							multi_content.push(content);
+							multi_caption.push(photo_item["caption"]);
+						}
+					
+					} else { // single photo only
+						tumblr_content = ['<img src="', this["photo-url-500"],
+							'" class="embedded-tumblr-image" alt="tumblr image" />'].join('');
+						tumblr_caption = this["photo-caption"] || null;
+					}
+					break;
+			}
+			
+			/*
+			
+			div class tumblr-post
+			date
+			(title if found)
+			main content (text,photo,video,etc)
+			(caption if found)
+			hr
+			(permalink) | (tags)
+			*/
+			
+			
+			var tumblr_div = [
+				'<div class="embedded-tumblr">',
+				'<div class="embedded-tumblr-date">',
+				date_string, '</div>'];
+			
+			// is there a title
+			if (tumblr_title != null) {
+				tumblr_div.push('<div class="embedded-tumblr-title">');
+				tumblr_div.push(tumblr_title);
+				tumblr_div.push('</div>');
+			}
+			
+			// main content: is there one more items (i.e. photos)
+			if (multi_content == false) {
+				// single item
+				var content_string = [
+					'<div class="embedded-tumblr-content ',
+					type, '">', tumblr_content];
+				// caption?
+				if (tumblr_caption != null) {
+					content_string.push('<div class="embedded-tumblr-caption">');
+					content_string.push(tumblr_caption);
+					content_string.push('</div>');
+				}
+				tumblr_div.push(content_string.join(''));
+			} else {
+				// build multi-content div
+				var multi_content_string = new Array();
+				for(var c=0;c<multi_content.length;c++) {
+					var temp_string = [
+						'<div class="embedded-tumblr-content ', type, '">',
+						multi_content[c], '<br/>',
+						'<div class="embedded-tumblr-caption">',
+						multi_caption[c], '</div>', '</div>'].join('');
+					multi_content_string.push(temp_string);
+				}
+				tumblr_div.push(multi_content_string.join(''));
+			}
+			// hr, permalink and tags
+			tumblr_div.push('<hr>');
+			tumblr_div.push('<div class="embedded-tumblr-permalink">');
+			tumblr_div.push(url);
+			tumblr_div.push('</div>');
+			tumblr_div.push('<div class="embedded-tumblr-tags">');
+			tumblr_div.push(tag_string);
+			tumblr_div.push('</div>');
+			
+			var tumblr_div_string = tumblr_div.join('');
+			
+			if ((element_name != undefined) && (element_name.length > 0)) {
+				$(elementName).append(tumblr_div_string);
+			} else {
+				// assume #tumblr-results
+				$('#tumblr-results').append(tumblr_div_string);
+			}
+      
+    });
+ });
+	
+	
+	
+	
+}
+
+/**
+ * Function to return event data from JSON formatted views
+ * coming from the GSAPP events site
+ *
+ * @param {String} url The URL for the JSON feed
+ * @param {String} elementName The name of the DOM container to write into
+ * @return void
+ */
 gsappFetcher.getEventData = function(url, elementName) {
 	gsappFetcher.log("getting data from " + url + " into " + elementName);
 	$.getJSON(url, function(data) {
