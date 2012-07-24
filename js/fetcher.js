@@ -337,10 +337,21 @@ gsappFetcher.getTumblr = function(url, element_name) {
 					tumblr_caption = this["id3-title"] || null;
 					break;
 				case 'conversation':
-				
+					
 				//TODO break up into structured inner divs
+					var temp_content = new Array();
+					for(var c=0; c< this["conversation"].length;c++) {
+						var conversation_part = this["conversation"][c];
+						var inner_convo_string = [
+							'<div class="embed-tumblr-conversation-segment">',
+							'<div class="embed-tumblr-conversation-speaker">',
+							conversation_part["name"], ': </div>',
+							'<div class="embed-tumblr-conversation-phrase">',
+							conversation_part["phrase"], '</div>', '</div>'].join('');
+						temp_content.push(inner_convo_string);
+					}
 					tumblr_title = this["conversation-title"] || null;
-					tumblr_content = this["conversation-text"];
+					tumblr_content = temp_content.join('');
 					break;
 				case 'regular':
 					tumblr_title = this["regular-title"] || null;
@@ -400,7 +411,6 @@ gsappFetcher.getTumblr = function(url, element_name) {
 				}
 				tumblr_div.push(multi_content_string.join(''));
 			}
-			tumblr_div.push('<hr>');
 			tumblr_div.push('<div class="embedded-tumblr-permalink">');
 			tumblr_div.push(url);
 			tumblr_div.push('</div>');
