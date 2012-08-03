@@ -313,10 +313,10 @@ gsappFetcher.getTumblr = function(url, element_name) {
 				case 'link':
 					tumblr_content_a = new Array();
 					if (this["link-text"] != null) {
-						tumblr_content_a= ['<a href="', this["link_url"], '" target="_blank">', this["link-text"], '</a>'];
+						tumblr_content_a= ['<h2><a href="', this["link_url"], '" target="_blank">', this["link-text"], '</a></h2>'];
 					} else {
 						// no title
-						tumblr_content_a = ['<a href="', this["link_url"], '" target="_blank">', this["link-url"], '</a>'];
+						tumblr_content_a = ['<h2><a href="', this["link_url"], '" target="_blank">', this["link-url"], '</a></h2>'];
 					}					
 					if (this["link-description"].length > 0) {
 						tumblr_content_a.push('<div class="embedded-tumblr-link-description">');
