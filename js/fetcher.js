@@ -533,7 +533,10 @@ gsappFetcher.getEventData = function(url, elementName) {
 			$(elementName).append(event_div);
 		}
 		
-		$("#tmpltzr .content #event-output .embedded-event-top-area").hover(function() {
+		
+		$("#tmpltzr .content #event-output .embedded-event a .embedded-event-top-area").hover(function() {
+			console.log('hovering');
+			
 			$(this).children(".embedded-event-date-box").addClass('filled');
 		}, 
 		function() {
