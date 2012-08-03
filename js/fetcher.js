@@ -122,7 +122,8 @@ gsappFetcher.getEventTypesFromHTML = function(types_string) {
 
 /**
  * Parse event description from Drupal post body, extracting
- * all of the p tags
+ * all of the p tags and stripping out 'strong' tags
+ *
  * @param {String} The body string from Drupal view output
  * @return {Array} An array of paragraph tags
  */
@@ -132,11 +133,14 @@ gsappFetcher.parseEventBodyHTML = function(body_string) {
 
 	for(var p=0;p<body_element.length;p++) {
 		var inner_element = body_element[p];
+		
 		if (inner_element === Object(inner_element)) {
 			var html_data = inner_element.outerHTML;
 			var inner_html = inner_element.innerHTML;
 			// if inner_html len is < 6 then its probably just an nbsp tag
 			if ((inner_html != undefined) && (inner_html.length > 6)) {
+				// regex to strip out strong tag only
+				html_data = html_data.replace(/<[//]{0,1}(strong|b)[^><]*>/g,"");
 				p_tags.push(html_data);
 			}
 		}
@@ -500,6 +504,9 @@ gsappFetcher.getEventData = function(url, elementName) {
 			// for now we only care about the first 2 paragraphs if they are not empty
 			var event_description_string = [
 				event_description[0], event_description[1]].join(''); 
+			
+			
+			
 			
 			// build the div
 			var event_div = ['<div class="embedded-event">',
