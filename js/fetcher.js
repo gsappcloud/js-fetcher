@@ -281,179 +281,182 @@ gsappFetcher.getTumblr = function(url, element_name) {
 	}
 	final_url = url + "/api/read/json?callback=?";
 	
-	$.getJSON(final_url, function(data) {
-    $.each(data.posts.slice(0,gsappFetcher.tumblr_posts), function(i,posts){
-      var type = this.type;
-			var url = this.url;
-			var multi_content_flag = false; 
-		
-      // format the date
-      var date_ts = this["unix-timestamp"];
-      var date = new Date(date_ts*1000); // must multiply by 1000 (js specific)
-      var date_string = gsappFetcher.formatDate(date);
 
-			// process tags if any
-      var tags = this.tags || null;
-			var tag_string = '';      
-      if (this.tags != null) {
-      	tag_string = this.tags.join(', ');
-      }
-			
-			// does the post body contain multiple photos?
-			if ((this.type == 'photo') && (this["photos"].length > 0)) {
-				multi_content_flag = true;
-			}
-			
-			// TODO image aspect resizing for proper IMG tags
-
-			var tumblr_title = null;
-			var tumblr_content = null;
-			var tumblr_caption = null;
-			var multi_content = new Array();
-			var multi_caption = new Array();
-			
-			switch(type) {
+		$.getJSON(final_url, function(data) {
+			$.each(data.posts.slice(0,gsappFetcher.tumblr_posts), function(i,posts){
+			  var type = this.type;
+					var url = this.url;
+					var multi_content_flag = false; 
 				
-				case 'link':
-					tumblr_content_a = new Array();
-					if (this["link-text"] != null) {
-						tumblr_content_a= ['<h2><a href="', this["link_url"], '" target="_blank">', this["link-text"], '</a></h2>'];
-					} else {
-						// no title
-						tumblr_content_a = ['<h2><a href="', this["link_url"], '" target="_blank">', this["link-url"], '</a></h2>'];
-					}					
-					if (this["link-description"].length > 0) {
-						tumblr_content_a.push('<div class="embedded-tumblr-link-description">');
-						tumblr_content_a.push(this["link-description"]);
-						tumblr_content_a.push('</div>');
-					}
-					tumblr_content = tumblr_content_a.join('');
-					break;					
-				case 'quote':
-					tumblr_content = [this["quote-text"], "<br/>&mdash; ", this["quote-source"]].join('');
-					break;
-				case 'video':
-					tumblr_content = this["video-player-500"];
-					tumblr_caption = this["video-caption"] || null;
-					break;
-				case 'audio':
-					tumblr_content = this["audio-player"];
-					tumblr_caption = this["id3-title"] || null;
-					break;
-				case 'conversation':
+			  // format the date
+			  var date_ts = this["unix-timestamp"];
+			  var date = new Date(date_ts*1000); // must multiply by 1000 (js specific)
+			  var date_string = gsappFetcher.formatDate(date);
+		
+					// process tags if any
+			  var tags = this.tags || null;
+					var tag_string = '';      
+			  if (this.tags != null) {
+				tag_string = this.tags.join(', ');
+			  }
 					
-				//TODO break up into structured inner divs
-					var temp_content = new Array();
-					for(var c=0; c< this["conversation"].length;c++) {
-						var conversation_part = this["conversation"][c];
-						var inner_convo_string = [
-							'<div class="embed-tumblr-conversation-segment">',
-							'<div class="embed-tumblr-conversation-speaker">',
-							conversation_part["name"], ': </div>',
-							'<div class="embed-tumblr-conversation-phrase">',
-							conversation_part["phrase"], '</div>', '</div>'].join('');
-						temp_content.push(inner_convo_string);
-					}
-					tumblr_title = this["conversation-title"] || null;
-					tumblr_content = temp_content.join('');
-					break;
-				case 'regular':
-					tumblr_title = this["regular-title"] || null;
-					tumblr_content = this["regular-body"] || null;
-					break;
-				case 'photo': // consider multi, if yes, then make arrays
-					if (multi_content_flag == true) {
-						for(var c=0;c<this["photos"].length;c++) {
-							var photo_item = this["photos"][c];
-							if(c == 0){
-								var content = ['<img src="', photo_item["photo-url-500"],
-							'" class="tmpltzr-image" alt="tumblr image" />'].join('');
-							}else{
-								var content = ['<img src="', photo_item["photo-url-250"],
-							'" class="tmpltzr-image-small" alt="tumblr image" />'].join('');
-							}
-							multi_content.push(content);
-							multi_caption.push(photo_item["caption"]);
+				// does the post body contain multiple photos?
+				if ((this.type == 'photo') && (this["photos"].length > 0)) {
+					multi_content_flag = true;
+				}
+				
+				// TODO image aspect resizing for proper IMG tags
+		
+				var tumblr_title = null;
+				var tumblr_content = null;
+				var tumblr_caption = null;
+				var multi_content = new Array();
+				var multi_caption = new Array();
+				
+				switch(type) {
+					
+					case 'link':
+						tumblr_content_a = new Array();
+						if (this["link-text"] != null) {
+							tumblr_content_a= ['<h2><a href="', this["link_url"], '" target="_blank">', this["link-text"], '</a></h2>'];
+						} else {
+							// no title
+							tumblr_content_a = ['<h2><a href="', this["link_url"], '" target="_blank">', this["link-url"], '</a></h2>'];
+						}					
+						if (this["link-description"].length > 0) {
+							tumblr_content_a.push('<div class="embedded-tumblr-link-description">');
+							tumblr_content_a.push(this["link-description"]);
+							tumblr_content_a.push('</div>');
 						}
-					
-					} else { // single photo only
-						tumblr_content = ['<img src="', this["photo-url-500"],
-							'" class="tmpltzr-image" alt="tumblr image" />'].join('');
-						tumblr_caption = this["photo-caption"] || null;
-					}
-					break;
-			}
-			
-			var tumblr_div = [
-				'<div class="embedded-tumblr">',
-				'<div class="tumblr-post-date">',
-				date_string, '</div>'];
-			
-			// is there a title
-			if (tumblr_title != null) {
-				tumblr_div.push('<h2>');
-				tumblr_div.push(tumblr_title);
-				tumblr_div.push('</h2>');
-			}
-			
-			// main content: is there one more items (i.e. photos)
-			if (multi_content == false) {
-				var content_string = [
-					'<div class="tmpltzr-body ',
-					type, '">', tumblr_content];
-				if (tumblr_caption != null) {
-					content_string.push('<div class="tmpltzr-caption">');
-					content_string.push(tumblr_caption);
-					content_string.push('</div>');
-				}
-				tumblr_div.push(content_string.join(''));
-			} else {
-				// build multi-content div
-				var multi_content_string = new Array();
-				var first = ' first';
-				var even = '';
-				for(var c=0;c<multi_content.length;c++) {
-					var temp_string = [
-						'<div class="tmpltzr-body ', type, first, even, '">',
-						multi_content[c], '<br/>'];
-					if ((multi_caption[c] != undefined) && (multi_caption[c].length > 0)) {
-						temp_string.push('<div class="tmpltzr-caption">');
-						temp_string.push(multi_caption[c]);
-						temp_string.push('</div>');
-					}
+						tumblr_content = tumblr_content_a.join('');
+						break;					
+					case 'quote':
+						tumblr_content = [this["quote-text"], "<br/>&mdash; ", this["quote-source"]].join('');
+						break;
+					case 'video':
+						tumblr_content = this["video-player-500"];
+						tumblr_caption = this["video-caption"] || null;
+						break;
+					case 'audio':
+						tumblr_content = this["audio-player"];
+						tumblr_caption = this["id3-title"] || null;
+						break;
+					case 'conversation':
 						
-					temp_string.push('</div>');
-					var temp_string_final = temp_string.join('');
-					first = ' photoset';
-					if(c%2 == 1){
-						even = ' odd';
-					}else{
-						even = ' even';
-					}
-					multi_content_string.push(temp_string_final);
+					//TODO break up into structured inner divs
+						var temp_content = new Array();
+						for(var c=0; c< this["conversation"].length;c++) {
+							var conversation_part = this["conversation"][c];
+							var inner_convo_string = [
+								'<div class="embed-tumblr-conversation-segment">',
+								'<div class="embed-tumblr-conversation-speaker">',
+								conversation_part["name"], ': </div>',
+								'<div class="embed-tumblr-conversation-phrase">',
+								conversation_part["phrase"], '</div>', '</div>'].join('');
+							temp_content.push(inner_convo_string);
+						}
+						tumblr_title = this["conversation-title"] || null;
+						tumblr_content = temp_content.join('');
+						break;
+					case 'regular':
+						tumblr_title = this["regular-title"] || null;
+						tumblr_content = this["regular-body"] || null;
+						break;
+					case 'photo': // consider multi, if yes, then make arrays
+						if (multi_content_flag == true) {
+							for(var c=0;c<this["photos"].length;c++) {
+								var photo_item = this["photos"][c];
+								if(c == 0){
+									var content = ['<img src="', photo_item["photo-url-500"],
+								'" class="tmpltzr-image" alt="tumblr image" />'].join('');
+								}else{
+									var content = ['<img src="', photo_item["photo-url-250"],
+								'" class="tmpltzr-image-small" alt="tumblr image" />'].join('');
+								}
+								multi_content.push(content);
+								multi_caption.push(photo_item["caption"]);
+							}
+						
+						} else { // single photo only
+							tumblr_content = ['<img src="', this["photo-url-500"],
+								'" class="tmpltzr-image" alt="tumblr image" />'].join('');
+							tumblr_caption = this["photo-caption"] || null;
+						}
+						break;
 				}
-				tumblr_div.push(multi_content_string.join(''));
-			}
-			tumblr_div.push('<div class="embedded-tumblr-permalink"><a href="');
-			tumblr_div.push(url);
-			tumblr_div.push('" target="_blank">Visit this post</a></div>');
-			if(this.tags != null){
-				tumblr_div.push('<div class="tmpltzr-tags">Tags: ');
-				tumblr_div.push(tag_string);
-				tumblr_div.push('</div>');
-			}
-			
-			var tumblr_div_string = tumblr_div.join('');
-			
-			if ((element_name != undefined) && (element_name.length > 0)) {
-				$(elementName).append(tumblr_div_string);
-			} else {
-				$('#tumblr-results').append(tumblr_div_string);
-			}
-      
-    });
- });
-	
+				
+				var tumblr_div = [
+					'<div class="embedded-tumblr">',
+					'<div class="tumblr-post-date">',
+					date_string, '</div>'];
+				
+				// is there a title
+				if (tumblr_title != null) {
+					tumblr_div.push('<h2>');
+					tumblr_div.push(tumblr_title);
+					tumblr_div.push('</h2>');
+				}
+				
+				// main content: is there one more items (i.e. photos)
+				if (multi_content == false) {
+					var content_string = [
+						'<div class="tmpltzr-body ',
+						type, '">', tumblr_content];
+					if (tumblr_caption != null) {
+						content_string.push('<div class="tmpltzr-caption">');
+						content_string.push(tumblr_caption);
+						content_string.push('</div>');
+					}
+					tumblr_div.push(content_string.join(''));
+				} else {
+					// build multi-content div
+					var multi_content_string = new Array();
+					var first = ' first';
+					var even = '';
+					for(var c=0;c<multi_content.length;c++) {
+						var temp_string = [
+							'<div class="tmpltzr-body ', type, first, even, '">',
+							multi_content[c], '<br/>'];
+						if ((multi_caption[c] != undefined) && (multi_caption[c].length > 0)) {
+							temp_string.push('<div class="tmpltzr-caption">');
+							temp_string.push(multi_caption[c]);
+							temp_string.push('</div>');
+						}
+							
+						temp_string.push('</div>');
+						var temp_string_final = temp_string.join('');
+						first = ' photoset';
+						if(c%2 == 1){
+							even = ' odd';
+						}else{
+							even = ' even';
+						}
+						multi_content_string.push(temp_string_final);
+					}
+					tumblr_div.push(multi_content_string.join(''));
+				}
+				tumblr_div.push('<div class="embedded-tumblr-permalink"><a href="');
+				tumblr_div.push(url);
+				tumblr_div.push('" target="_blank">Visit this post</a></div>');
+				if(this.tags != null){
+					tumblr_div.push('<div class="tmpltzr-tags">Tags: ');
+					tumblr_div.push(tag_string);
+					tumblr_div.push('</div>');
+				}
+				
+				var tumblr_div_string = tumblr_div.join('');
+				
+				if ((element_name != undefined) && (element_name.length > 0)) {
+					$(elementName).append(tumblr_div_string);
+				} else {
+					$('#tumblr-results').append(tumblr_div_string);
+				}
+			  
+			});
+		})
+		.error(function() { gsappFetcher.log('error loading tumblr'); })
+		.complete(function() { BuildWall(); });
+
 	
 	
 	
@@ -546,7 +549,9 @@ gsappFetcher.getEventData = function(url, elementName) {
 		
 		
 		
-	}); // end getJSON
+	})
+	.error(function() { gsappFetcher.log('error loading event data'); })
+	.complete(function() {  }); // end getJSON
 	
 }
 
